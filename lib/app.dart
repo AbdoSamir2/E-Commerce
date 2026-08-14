@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/api/api_client.dart';
-import 'core/routing/app_router.dart';
 import 'core/storage/local_storage_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
+import 'core/theme/theme_state.dart';
+import 'features/catalog/home_screen.dart'; // تأكد من صحة مسار شاشتك هنا
 
 class EcommerceApp extends StatelessWidget {
   const EcommerceApp({
@@ -25,13 +27,24 @@ class EcommerceApp extends StatelessWidget {
           value: localStorageService,
         ),
       ],
-      child: MaterialApp.router(
-        title: 'E-Commerce',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        routerConfig: appRouter,
+      child: BlocProvider(
+        create: (context) => ThemeCubit(),
+        child: BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, state) {
+            final isDark = state is DarkThemeState;
+
+            return MaterialApp(
+              title: 'E-Commerce',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+
+              // تجربة الشاشة مباشرة هنا
+              home: const HomeScreen(),
+            );
+          },
+        ),
       ),
     );
   }
