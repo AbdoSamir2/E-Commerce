@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'app.dart';
-import 'core/api/api_client.dart';
-import 'core/observer/app_bloc_observer.dart';
-import 'core/storage/local_storage_service.dart';
+import 'splash_screen.dart';
+import 'login_screen.dart';
+import 'main_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
 
-  Bloc.observer = const AppBlocObserver();
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  final localStorageService = LocalStorageService(SharedPreferencesAsync());
-
-  final apiClient = ApiClient();
-
-  runApp(
-    EcommerceApp(
-      apiClient: apiClient,
-      localStorageService: localStorageService,
-    ),
-  );
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'E-Commerce App',
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+        primaryColor: Colors.orange,
+      ),
+      home: const SplashScreen(),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const MainShell(),
+      },
+    );
+  }
 }
