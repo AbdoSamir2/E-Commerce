@@ -3,15 +3,21 @@ import '../../core/widgets/app_logo.dart';
 import '../../core/theme/theme_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme/theme_state.dart';
+import 'home_widgets/category_item.dart';
+import 'home_widgets/section_header.dart';
+import 'home_widgets/product_card.dart';
+import '../../models/product_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-   // final themeState = context.watch<ThemeCubit>().state;
-    // final isDarkMode = themeState is DarkThemeState;//====>temperory to avoid merge conflict only :)
-        final isDarkMode = false;
+    final themeState = context.watch<ThemeCubit>().state;
+    final isDarkMode =
+        themeState
+            is DarkThemeState; //====>temperory to avoid merge conflict only :) ==>last two lines be commented and next line be u -K
+    //   final isDarkMode = false;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -40,11 +46,78 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                    
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
+              SizedBox(
+                height: 45,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: const [
+                    SizedBox(height: 10),
+                    CategoryItem(
+                      title: 'all',
+                      icon: Icons.grid_view_rounded,
+                      isSelected: true,
+                    ),
+                    SizedBox(width: 12),
+                    CategoryItem(
+                      title: 'electornics',
+                      icon: Icons.devices_rounded,
+                    ),
+                    SizedBox(width: 12),
+                    CategoryItem(title: 'wears', icon: Icons.checkroom_rounded),
+                    SizedBox(width: 12),
+                    CategoryItem(
+                      title: 'shoes',
+                      icon: Icons.straighten_rounded,
+                    ),
+                    SizedBox(width: 12),
+                    CategoryItem(title: 'watches', icon: Icons.watch_rounded),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              SectionHeader(
+                title: 'Popular Products',
+                onSeeAllPressed: () {
+                  //will be editied soon
+                },
+              ),
+              GridView.builder(
+               shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.72,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount:
+                    dummyProducts.length,
+                itemBuilder: (context, index) {
+                  final product =
+                      dummyProducts[index]; 
+
+                  return ProductCard(
+                    title: product.title,
+                    price: product.price,
+                    imageUrl: product.imageUrl,
+                    rating: product.rating,
+                  );
+                },
+              ),
             ],
+          
           ),
+          
         ),
       ),
     );

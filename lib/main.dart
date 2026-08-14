@@ -13,7 +13,6 @@ void main() {
   Bloc.observer = const AppBlocObserver();
 
   final localStorageService = LocalStorageService(SharedPreferencesAsync());
-
   final apiClient = ApiClient();
 
   runApp(
