@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/navigation/presentation/screens/main_shell.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -15,19 +18,19 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.splash,
       builder: (context, state) {
-        return const _PlaceholderScreen(title: 'Splash');
+        return const SplashScreen();
       },
     ),
     GoRoute(
       path: AppRoutes.login,
       builder: (context, state) {
-        return const _PlaceholderScreen(title: 'Login');
+        return const LoginScreen();
       },
     ),
     GoRoute(
       path: AppRoutes.home,
       builder: (context, state) {
-        return const _PlaceholderScreen(title: 'Home');
+        return const MainShell();
       },
     ),
     GoRoute(

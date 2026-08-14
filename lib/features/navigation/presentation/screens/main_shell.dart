@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'splash_screen.dart';
-import 'login_screen.dart';
-import 'main_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -12,37 +9,34 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
-  final List<Widget> _screens = [
-    const Center(child: Text('Home Screen', style: TextStyle(fontSize: 18))),
 
-    const Center(
-      child: Text('Categories Screen', style: TextStyle(fontSize: 18)),
-    ),
-
-    const Center(child: Text('Cart Screen', style: TextStyle(fontSize: 18))),
-
-    const Center(child: Text('Profile Screen', style: TextStyle(fontSize: 18))),
+  static const _screens = <Widget>[
+    Center(child: Text('Home Screen')),
+    Center(child: Text('Categories Screen')),
+    Center(child: Text('Cart Screen')),
+    Center(child: Text('Profile Screen')),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
-
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex, //to highlight bottom
+        currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined), //مجرد تحديد لما تدوس عليخ
+            icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home',
           ),

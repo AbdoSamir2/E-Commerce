@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'splash_screen.dart';
-import 'login_screen.dart';
-import 'main_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/storage_keys.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/storage/local_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,43 +21,44 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 3));
+    final storage = context.read<LocalStorageService>();
 
-    bool isLoggedIn = false;
+    await Future<void>.delayed(const Duration(seconds: 3));
+    final token = await storage.getString(StorageKeys.authToken);
 
-    if (!mounted) return;
-
-    if (isLoggedIn) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
+    if (!mounted) {
+      return;
     }
+
+    final destination = token?.isNotEmpty == true
+        ? AppRoutes.home
+        : AppRoutes.login;
+    context.go(destination);
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      body: Stack(
+      backgroundColor: colorScheme.primary,
+      body: const Stack(
         children: [
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(
                   Icons.shopping_bag_rounded,
                   size: 110,
                   color: Colors.white,
                 ),
                 SizedBox(height: 30),
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                CircularProgressIndicator(color: Colors.white),
               ],
             ),
           ),
-
-          const Positioned(
+          Positioned(
             bottom: 30,
             left: 0,
             right: 0,

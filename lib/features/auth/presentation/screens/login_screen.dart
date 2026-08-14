@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import 'splash_screen.dart';
-import 'login_screen.dart';
-import 'main_screen.dart';
+import '../../../../core/routing/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,14 +12,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   bool _isPasswordObscured = true;
 
   @override
-  //remove >> gmail and pass
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -28,21 +25,25 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _submitLogin() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Logging in...')));
-      Navigator.pushReplacementNamed(context, '/home');
+    if (_formKey.currentState?.validate() != true) {
+      return;
     }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Logging in...')));
+    context.go(AppRoutes.home);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -52,51 +53,56 @@ class _LoginScreenState extends State<LoginScreen> {
                   Icon(
                     Icons.lock_person_rounded,
                     size: 80,
-                    color: Colors.orange,
+                    color: theme.colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
-
-                  const Text(
+                  Text(
                     'LOGIN',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 32),
-
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    autofillHints: const [AutofillHints.email],
                     decoration: const InputDecoration(
-                      labelText: 'email',
+                      labelText: 'Email',
                       prefixIcon: Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(),
                     ),
-
-                    //validation in email....
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'please enter your email';
+                      final email = value?.trim() ?? '';
+
+                      if (email.isEmpty) {
+                        return 'Please enter your email';
                       }
 
                       if (!RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      ).hasMatch(value)) {
+                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,}$',
+                      ).hasMatch(email)) {
                         return 'Please enter a valid email address';
                       }
+
                       return null;
                     },
                   ),
                   const SizedBox(height: 20),
-
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: _isPasswordObscured, //الباس مخفي في الاول
+                    obscureText: _isPasswordObscured,
+                    textInputAction: TextInputAction.done,
+                    autofillHints: const [AutofillHints.password],
+                    onFieldSubmitted: (_) => _submitLogin(),
                     decoration: InputDecoration(
-                      labelText: 'password',
+                      labelText: 'Password',
                       prefixIcon: const Icon(Icons.lock_outline),
-                      border: const OutlineInputBorder(),
-
                       suffixIcon: IconButton(
+                        tooltip: _isPasswordObscured
+                            ? 'Show password'
+                            : 'Hide password',
                         icon: Icon(
                           _isPasswordObscured
                               ? Icons.visibility_off
@@ -113,23 +119,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
                       }
+
                       if (value.length < 6) {
-                        return 'The password must be at least 6 characters long.';
+                        return 'Password must be at least 6 characters long';
                       }
+
                       return null;
                     },
                   ),
                   const SizedBox(height: 28),
-
                   ElevatedButton(
                     onPressed: _submitLogin,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('login', style: TextStyle(fontSize: 16)),
+                    child: const Text('Login'),
                   ),
                 ],
               ),
