@@ -6,7 +6,9 @@ import 'core/storage/local_storage_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/theme/theme_state.dart';
-import 'features/catalog/home_screen.dart'; // تأكد من صحة مسار شاشتك هنا
+import 'features/catalog/home_screen.dart'; 
+
+import 'features/cart/logic/cart/cart_cubit.dart';
 
 class EcommerceApp extends StatelessWidget {
   const EcommerceApp({
@@ -27,8 +29,17 @@ class EcommerceApp extends StatelessWidget {
           value: localStorageService,
         ),
       ],
-      child: BlocProvider(
-        create: (context) => ThemeCubit(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => ThemeCubit(),
+          ),
+          BlocProvider(
+            create: (context) => CartCubit(
+              context.read<LocalStorageService>(),
+            )..loadCart(),
+          ),
+        ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
             final isDark = state is DarkThemeState;
@@ -39,8 +50,6 @@ class EcommerceApp extends StatelessWidget {
               theme: AppTheme.light,
               darkTheme: AppTheme.dark,
               themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-
-              // تجربة الشاشة مباشرة هنا
               home: const HomeScreen(),
             );
           },
@@ -49,3 +58,4 @@ class EcommerceApp extends StatelessWidget {
     );
   }
 }
+
