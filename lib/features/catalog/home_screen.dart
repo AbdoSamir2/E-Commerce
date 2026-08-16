@@ -8,6 +8,9 @@ import 'home_widgets/section_header.dart';
 import 'home_widgets/product_card.dart';
 import '../../models/product_model.dart';
 
+import '../cart/logic/cart/cart_cubit.dart';
+import '../cart/logic/cart/cart_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -45,8 +48,17 @@ class HomeScreen extends StatelessWidget {
                           color: isDarkMode ? Colors.amber : Colors.indigo,
                         ),
                       ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const CartScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.shopping_cart_outlined),
+                      ),
                     ],
-                    
                   ),
                 ],
               ),
@@ -88,7 +100,7 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
               GridView.builder(
-               shrinkWrap: true,
+                shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -100,24 +112,33 @@ class HomeScreen extends StatelessWidget {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount:
-                    dummyProducts.length,
+                itemCount: dummyProducts.length,
                 itemBuilder: (context, index) {
-                  final product =
-                      dummyProducts[index]; 
+                  final product = dummyProducts[index];
 
                   return ProductCard(
                     title: product.title,
                     price: product.price,
                     imageUrl: product.imageUrl,
                     rating: product.rating,
+                    onAddToCart: () {
+                      context.read<CartCubit>().addToCart(
+                      title: product.title,
+                      price: double.parse(product.price),
+                      imageUrl: product.imageUrl,
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                        content: Text('${product.title} added to cart'),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
             ],
-          
           ),
-          
         ),
       ),
     );
