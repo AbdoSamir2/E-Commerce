@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/QuantityCubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/WishlistCubit.dart';
+import 'package:e_commerce_project/features/cart/logic/cart/cart_cubit.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String id;
@@ -63,30 +66,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 // Product Image
                 Center(
-                    child: Image.network(
-                      height: 320,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        return const SizedBox(
-                          height: 320,
-                          child: Center(
+                  child: Image.network(
+                    widget.imageUrl,
+                    height: 320,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const SizedBox(
+                        height: 320,
+                        child: Center(
+                          child: CircularProgressIndicator(color: Colors.black),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        height: 320,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 64,
+                            color: Colors.grey,
                           ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox(
-                          height: 320,
-                          child: Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
+                ),
                 const SizedBox(height: 30),
                 // Product Details
                 Row(
@@ -96,6 +102,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            widget.title, // هنا الاسم الحقيقي
+                            style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                               fontSize: 22,
@@ -147,9 +156,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
+                    color: widget.stockStatus.toLowerCase() == 'in stock'
+                        ? Colors.green.shade50
+                        : Colors.red.shade50,
                     borderRadius: BorderRadius.circular(38),
                   ),
+                  child: Text(
+                    widget.stockStatus, // حالة المخزون الحقيقية
                     style: TextStyle(
+                      color: widget.stockStatus.toLowerCase() == 'in stock'
+                          ? Colors.green
+                          : Colors.red,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -166,6 +183,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
+                  widget.description, // الوصف الحقيقي
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -178,6 +196,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
       ),
+      // Bottom Bar
       // Bottom Bar
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
@@ -194,9 +213,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         child: SafeArea(
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Price
+              Expanded(
                 child: Text(
+                  '\$${widget.price}',
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
@@ -217,6 +240,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       children: [
                         IconButton(
                           padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40, // ضيف السطر ده هنا
+                          ),
                           onPressed: () {
                             context.read<QuantityCubit>().decrement();
                           },
@@ -231,6 +258,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         IconButton(
                           padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40, // وضيف السطر ده هنا كمان
+                          ),
                           onPressed: () {
                             context.read<QuantityCubit>().increment();
                           },
@@ -250,15 +281,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 25),
+                    minimumSize: const Size(64, 40), // <-- ضيف السطر ده
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
                   onPressed: () {
                     final quantity = context.read<QuantityCubit>().state;
+
+                    context.read<CartCubit>().addToCart(
+                      title: widget.title,
+                      price: widget.price,
+                      imageUrl: widget.imageUrl,
+                      quantity: quantity,
+                    );
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
+                          'تم إضافة $quantity من ${widget.title} لعربة التسوق!',
                         ),
                         backgroundColor: Colors.green,
                         duration: const Duration(seconds: 2),
