@@ -18,7 +18,8 @@ class CartItem {
     double? price,
     String? imageUrl,
     int? quantity,
-  }) {
+  })
+  {
     return CartItem(
       title: title ?? this.title,
       price: price ?? this.price,

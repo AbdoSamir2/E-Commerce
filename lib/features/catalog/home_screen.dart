@@ -11,6 +11,12 @@ import '../../models/product_model.dart';
 import '../cart/logic/cart/cart_cubit.dart';
 import '../cart/logic/cart/cart_screen.dart';
 
+import 'package:e_commerce_project/features/productdetailed/Logic/QuantityCubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/WishlistCubit.dart';
+import 'package:e_commerce_project/features/productdetailed/ProductDetaildScreen.dart';
+
+import 'package:e_commerce_project/features/wishlist/wishlist_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -27,10 +33,10 @@ class HomeScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: .spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const AppLogo(),
                   Row(
@@ -52,11 +58,23 @@ class HomeScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => const CartScreen(),
+                              builder: (_) => CartScreen(
+                                onStartShopping: () {Navigator.of(context).pop();},
+                              ),
                             ),
                           );
                         },
                         icon: const Icon(Icons.shopping_cart_outlined),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const WishlistScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.favorite_border_rounded),
                       ),
                     ],
                   ),
@@ -92,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SectionHeader(
                 title: 'Popular Products',
                 onSeeAllPressed: () {
@@ -121,16 +139,38 @@ class HomeScreen extends StatelessWidget {
                     price: product.price,
                     imageUrl: product.imageUrl,
                     rating: product.rating,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider(create: (_) => QuantityCubit()),
+                              BlocProvider(
+                                create: (_) => WishlistCubit(product.id),
+                              ),
+                            ],
+                            child: ProductDetailScreen(
+                              id: product.id,
+                              title: product.title,
+                              price: double.parse(product.price.toString()),
+                              imageUrl: product.imageUrl,
+                              description: product.description,
+                              stockStatus: product.stockStatus,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                     onAddToCart: () {
                       context.read<CartCubit>().addToCart(
-                      title: product.title,
-                      price: double.parse(product.price),
-                      imageUrl: product.imageUrl,
+                        title: product.title,
+                        price: double.parse(product.price.toString()),
+                        imageUrl: product.imageUrl,
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                        content: Text('${product.title} added to cart'),
+                          content: Text('${product.title} added to cart'),
                         ),
                       );
                     },

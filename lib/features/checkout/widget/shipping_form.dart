@@ -16,9 +16,7 @@ class ShippingForm extends StatelessWidget
     required this.postalCodeController,
   });
 
-  String? _required(
-      String? value,
-      String fieldName,)
+  String? _required(String? value, String fieldName,)
   {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';
@@ -51,17 +49,12 @@ class ShippingForm extends StatelessWidget
     return null;
   }
 
-  InputDecoration _decoration(
-      String label,
-      IconData icon,
-      )
+  InputDecoration _decoration(String label, IconData icon,)
   {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12),),
     );
   }
 

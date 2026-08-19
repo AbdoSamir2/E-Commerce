@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/navigation/presentation/screens/main_shell.dart';
+import '../../features/checkout/screen/checkout_screen.dart';
+import '../../features/checkout/screen/order_history_screen.dart';
+import '../../features/profile/screens/profile_screen.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
+
   errorBuilder: (context, state) {
     return _PlaceholderScreen(
       title: 'Page not found',
       message: state.error?.toString(),
     );
   },
+
   routes: [
     GoRoute(
       path: AppRoutes.splash,
@@ -21,22 +25,26 @@ final GoRouter appRouter = GoRouter(
         return const SplashScreen();
       },
     ),
+
     GoRoute(
       path: AppRoutes.login,
       builder: (context, state) {
         return const LoginScreen();
       },
     ),
+
     GoRoute(
       path: AppRoutes.home,
       builder: (context, state) {
         return const MainShell();
       },
     ),
+
     GoRoute(
       path: AppRoutes.productDetails,
       builder: (context, state) {
-        final productId = state.pathParameters['productId'];
+        final productId =
+        state.pathParameters['productId'];
 
         return _PlaceholderScreen(
           title: 'Product details',
@@ -44,39 +52,55 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+
     GoRoute(
       path: AppRoutes.cart,
       builder: (context, state) {
-        return const _PlaceholderScreen(title: 'Cart');
+        return const _PlaceholderScreen(title: 'Cart',);
       },
     ),
+
     GoRoute(
       path: AppRoutes.checkout,
       builder: (context, state) {
-        return const _PlaceholderScreen(title: 'Checkout');
+        return const CheckoutScreen();
       },
     ),
+
     GoRoute(
       path: AppRoutes.profile,
       builder: (context, state) {
-        return const _PlaceholderScreen(title: 'Profile');
+        return const ProfileScreen();
+      },
+    ),
+
+    GoRoute(
+      path: AppRoutes.orderHistory,
+      builder: (context, state) {
+        return const OrderHistoryScreen();
       },
     ),
   ],
 );
 
 class _PlaceholderScreen extends StatelessWidget {
-  const _PlaceholderScreen({required this.title, this.message});
-
+  const _PlaceholderScreen({
+    required this.title,
+    this.message,
+  });
   final String title;
   final String? message;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+      ),
       body: Center(
-        child: Text(message ?? '$title screen is under development.'),
+        child: Text(
+          message ?? '$title screen is under development.',
+        ),
       ),
     );
   }
