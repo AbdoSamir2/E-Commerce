@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PaymentMethod extends StatelessWidget {
+class PaymentMethod extends StatelessWidget
+{
   final String selectedMethod;
   final ValueChanged<String> onChanged;
 
