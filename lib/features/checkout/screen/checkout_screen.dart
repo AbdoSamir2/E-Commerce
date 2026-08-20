@@ -8,6 +8,7 @@ import '../../../features/cart/logic/cart/cart_state.dart';
 import '../../cart/logic/cart/cart_item.dart';
 import '../../checkout/data/order_local_storge.dart';
 import '../../checkout/models/order_model.dart';
+import '../widget/payment.dart';
 
 class CheckoutScreen extends StatefulWidget
 {
@@ -250,7 +251,10 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                   ),
                   const SizedBox(height: 12),
 
-                  _buildPaymentMethod(),
+                  PaymentMethod(
+                    selectedMethod: _paymentMethod,
+                    onChanged: (value) {setState(() {_paymentMethod = value;});},
+                  ),
                   const SizedBox(height: 30),
 
                   SizedBox(
@@ -383,34 +387,4 @@ class _CheckoutScreenState extends State<CheckoutScreen>
     );
   }
 
-  Widget _buildPaymentMethod()
-  {
-    return Card(
-      child: Column(
-        children: [
-          RadioListTile<String>(
-            title:
-            const Text('Cash on Delivery'),
-            value: 'Cash on Delivery',
-            groupValue: _paymentMethod,
-            onChanged: (value) {
-              if (value == null) return;
-
-              setState(() {_paymentMethod = value;});
-            },
-          ),
-          RadioListTile<String>(
-            title: const Text('Credit Card'),
-            value: 'Credit Card',
-            groupValue: _paymentMethod,
-            onChanged: (value) {
-              if (value == null) return;
-
-              setState(() {_paymentMethod = value;});
-            },
-          ),
-        ],
-      ),
-    );
-  }
 }
