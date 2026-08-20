@@ -12,15 +12,13 @@ import '../widget/order_summary.dart';
 import '../widget/payment.dart';
 import '../widget/shipping_form.dart';
 
-class CheckoutScreen extends StatefulWidget
-{
+class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckoutScreenState extends State<CheckoutScreen>
-{
+class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -41,18 +39,23 @@ class _CheckoutScreenState extends State<CheckoutScreen>
   }
 
   Future<void> _placeOrder() async {
-    final cartState = context.read<CartCubit>().state;
+    final cartCubit = context.read<CartCubit>();
+    final cartState = cartCubit.state;
 
-    if (!_formKey.currentState!.validate()) {return;}
-
-    if (cartState.items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Your cart is empty.'),),
-      );
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    setState(() {_isPlacingOrder = true;});
+    if (cartState.items.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Your cart is empty.')));
+      return;
+    }
+
+    setState(() {
+      _isPlacingOrder = true;
+    });
     try {
       final order = Order(
         orderId: 'ORD-${DateTime.now().millisecondsSinceEpoch}',
@@ -70,21 +73,23 @@ class _CheckoutScreenState extends State<CheckoutScreen>
       final storage = context.read<LocalStorageService>();
       final orderStorage = OrderLocalStorage(storage);
       await orderStorage.saveOrder(order);
-      await context.read<CartCubit>().clearCart();
+      await cartCubit.clearCart();
 
-      if (!mounted) {return;}
-      context.go(AppRoutes.orderSuccessLocation(order.orderId),);
-    }
-    catch (error)
-    {
-      if (!mounted) {return;}
-      setState(() {_isPlacingOrder = false;});
+      if (!mounted) {
+        return;
+      }
+      context.go(AppRoutes.orderSuccessLocation(order.orderId));
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isPlacingOrder = false;
+      });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not place order: $error',),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not place order: $error')));
     }
   }
 
@@ -93,7 +98,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Checkout'), ),
+          appBar: AppBar(title: const Text('Checkout')),
           body: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -103,7 +108,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                 children: [
                   const Text(
                     'Order Summary',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
 
@@ -117,7 +122,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
 
                   const Text(
                     'Shipping Address',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
 
@@ -132,13 +137,17 @@ class _CheckoutScreenState extends State<CheckoutScreen>
 
                   const Text(
                     'Payment Method',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
 
                   PaymentMethod(
                     selectedMethod: _paymentMethod,
-                    onChanged: (value) {setState(() {_paymentMethod = value;});},
+                    onChanged: (value) {
+                      setState(() {
+                        _paymentMethod = value;
+                      });
+                    },
                   ),
                   const SizedBox(height: 30),
 
@@ -146,18 +155,22 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: _isPlacingOrder || cartState.items.isEmpty ? null : _placeOrder,
-                      child: _isPlacingOrder ? const SizedBox(
-                        width: 24, height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2,),
-                      )
+                      onPressed: _isPlacingOrder || cartState.items.isEmpty
+                          ? null
+                          : _placeOrder,
+                      child: _isPlacingOrder
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : Text(
-                        'Place Order - \$${cartState.grandTotal.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                              'Place Order - \$${cartState.grandTotal.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 20),

@@ -8,7 +8,7 @@ import '../../features/checkout/screen/order_history_screen.dart';
 import '../../features/checkout/screen/order_success.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/cart/logic/cart/cart_screen.dart';
-import '../../features/productdetailed/ProductDetaildScreen.dart';
+import '../../features/productdetailed/product_detail_screen.dart';
 import '../../models/product_model.dart';
 import 'app_routes.dart';
 
@@ -25,17 +25,23 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: AppRoutes.splash,
-      builder: (context, state) {return const SplashScreen();},
+      builder: (context, state) {
+        return const SplashScreen();
+      },
     ),
 
     GoRoute(
       path: AppRoutes.login,
-      builder: (context, state) {return const LoginScreen();},
+      builder: (context, state) {
+        return const LoginScreen();
+      },
     ),
 
     GoRoute(
       path: AppRoutes.home,
-      builder: (context, state) {return const MainShell();},
+      builder: (context, state) {
+        return const MainShell();
+      },
     ),
 
     GoRoute(
@@ -57,7 +63,11 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.cart,
       builder: (context, state) {
-        return CartScreen(onStartShopping: () {context.go(AppRoutes.home);},);
+        return CartScreen(
+          onStartShopping: () {
+            context.go(AppRoutes.home);
+          },
+        );
       },
     ),
 
@@ -72,37 +82,37 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.orderSuccess,
       builder: (context, state) {
         final orderId = state.uri.queryParameters['orderId'] ?? '';
-        return OrderSuccessScreen(orderId: orderId,);
+        return OrderSuccessScreen(orderId: orderId);
       },
     ),
 
     GoRoute(
       path: AppRoutes.profile,
-      builder: (context, state) {return const ProfileScreen();},
+      builder: (context, state) {
+        return const ProfileScreen();
+      },
     ),
 
     GoRoute(
       path: AppRoutes.orderHistory,
-      builder: (context, state) {return const OrderHistoryScreen();},
+      builder: (context, state) {
+        return const OrderHistoryScreen();
+      },
     ),
   ],
 );
 
 class _PlaceholderScreen extends StatelessWidget {
-  const _PlaceholderScreen({required this.title, this.message,});
+  const _PlaceholderScreen({required this.title, this.message});
   final String title;
   final String? message;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       body: Center(
-        child: Text(
-          message ?? '$title screen is under development.',
-        ),
+        child: Text(message ?? '$title screen is under development.'),
       ),
     );
   }

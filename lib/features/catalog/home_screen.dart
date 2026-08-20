@@ -11,9 +11,9 @@ import '../../models/product_model.dart';
 import '../cart/logic/cart/cart_cubit.dart';
 import '../cart/logic/cart/cart_screen.dart';
 
-import 'package:e_commerce_project/features/productdetailed/Logic/QuantityCubit.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/WishlistCubit.dart';
-import 'package:e_commerce_project/features/productdetailed/ProductDetaildScreen.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/quantity_cubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/wishlist_cubit.dart';
+import 'package:e_commerce_project/features/productdetailed/product_detail_screen.dart';
 
 import 'package:e_commerce_project/features/wishlist/wishlist_screen.dart';
 
@@ -59,7 +59,9 @@ class HomeScreen extends StatelessWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => CartScreen(
-                                onStartShopping: () {Navigator.of(context).pop();},
+                                onStartShopping: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
                             ),
                           );
