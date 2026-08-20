@@ -7,9 +7,13 @@ abstract final class AppRoutes {
   static const checkout = '/checkout';
   static const profile = '/profile';
   static const orderHistory = '/order-history';
+  static const orderSuccess = '/order-success';
 
-  static String productDetailsLocation(int productId,)
-  {
+  static String productDetailsLocation(int productId) {
     return '/products/$productId';
+  }
+
+  static String orderSuccessLocation(String orderId) {
+    return '/order-success?orderId=$orderId';
   }
 }

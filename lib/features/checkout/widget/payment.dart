@@ -5,11 +5,7 @@ class PaymentMethod extends StatelessWidget
   final String selectedMethod;
   final ValueChanged<String> onChanged;
 
-  const PaymentMethod({
-    super.key,
-    required this.selectedMethod,
-    required this.onChanged,
-  });
+  const PaymentMethod({super.key, required this.selectedMethod, required this.onChanged,});
 
   @override
   Widget build(BuildContext context)
