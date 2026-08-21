@@ -6,9 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/product_model.dart';
 import '../catalog/home_widgets/product_card.dart';
 import '../cart/logic/cart/cart_cubit.dart';
-import '../productdetailed/Logic/QuantityCubit.dart';
-import '../productdetailed/Logic/WishlistCubit.dart';
-import '../productdetailed/ProductDetaildScreen.dart';
+import '../productdetailed/Logic/quantity_cubit.dart';
+import '../productdetailed/Logic/wishlist_cubit.dart';
+import '../productdetailed/product_detailed_screen.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -84,7 +84,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       setState(() {
         _isLoading = false;
       });
-      print("Error loading favorites from Firebase: $e");
+      debugPrint("Error loading favorites from Firebase: $e");
     }
   }
 
