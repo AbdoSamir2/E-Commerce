@@ -28,6 +28,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeState = context.watch<ThemeCubit>().state;
     final isDarkMode = themeState is DarkThemeState;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -40,42 +41,50 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const AppLogo(),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.search),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          context.read<ThemeCubit>().toggleTheme();
-                        },
-                        icon: Icon(
-                          isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                          color: isDarkMode ? Colors.amber : Colors.indigo,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const CartScreen(),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.search),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              context.read<ThemeCubit>().toggleTheme();
+                            },
+                            icon: Icon(
+                              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                              color: isDarkMode ? Colors.amber : Colors.indigo,
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.shopping_cart_outlined),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const CartScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.shopping_cart_outlined),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const WishlistScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.favorite_border_rounded),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const WishlistScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.favorite_border_rounded),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -86,7 +95,6 @@ class HomeScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: const [
-                    SizedBox(height: 10),
                     CategoryItem(
                       title: 'all',
                       icon: Icons.grid_view_rounded,
