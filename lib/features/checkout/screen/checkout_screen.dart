@@ -79,7 +79,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return;
       }
       context.go(AppRoutes.orderSuccessLocation(order.orderId));
-    } catch (error) {
+    }
+    catch (error) {
       if (!mounted) {
         return;
       }
@@ -144,9 +145,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   PaymentMethod(
                     selectedMethod: _paymentMethod,
                     onChanged: (value) {
-                      setState(() {
-                        _paymentMethod = value;
-                      });
+                      setState(() {_paymentMethod = value;});
                     },
                   ),
                   const SizedBox(height: 30),
@@ -155,21 +154,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: _isPlacingOrder || cartState.items.isEmpty
-                          ? null
-                          : _placeOrder,
+                      onPressed: _isPlacingOrder || cartState.items.isEmpty ? null : _placeOrder,
+
                       child: _isPlacingOrder
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2),)
                           : Text(
                               'Place Order - \$${cartState.grandTotal.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold,),
                             ),
                     ),
                   ),
