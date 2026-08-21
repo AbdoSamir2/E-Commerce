@@ -50,10 +50,6 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.search),
-                          ),
-                          IconButton(
                             onPressed: () {
                               context.read<ThemeCubit>().toggleTheme();
                             },
@@ -89,36 +85,8 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                height: 45,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  children: const [
-                    CategoryItem(
-                      title: 'all',
-                      icon: Icons.grid_view_rounded,
-                      isSelected: true,
-                    ),
-                    SizedBox(width: 12),
-                    CategoryItem(
-                      title: 'electornics',
-                      icon: Icons.devices_rounded,
-                    ),
-                    SizedBox(width: 12),
-                    CategoryItem(title: 'wears', icon: Icons.checkroom_rounded),
-                    SizedBox(width: 12),
-                    CategoryItem(
-                      title: 'shoes',
-                      icon: Icons.straighten_rounded,
-                    ),
-                    SizedBox(width: 12),
-                    CategoryItem(title: 'watches', icon: Icons.watch_rounded),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              SectionHeader(title: 'Popular Products', onSeeAllPressed: () {}),
+              SectionHeader(title: 'Popular Products'),
+              
               BlocBuilder<ProductCubit, ProductState>(
                 builder: (context, state) {
                   if (state.status == ProductStatus.loading) {
