@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/quantity_cubit.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/wishlist_cubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/QuantityCubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/WishlistCubit.dart';
 import 'package:e_commerce_project/features/cart/logic/cart/cart_cubit.dart';
 
 class ProductDetailScreen extends StatefulWidget {

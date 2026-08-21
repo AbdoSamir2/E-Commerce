@@ -1,25 +1,13 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
+
 import '../errors/app_exception.dart';
 import 'api_constants.dart';
 
-class ApiClient
-{
-  ApiClient({Dio? dio}) : _dio = dio ?? Dio()
-  {
-    if (!kIsWeb)
-    {
-      _dio.httpClientAdapter = IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.connectionTimeout = ApiConstants.connectTimeout;
-          return client;
-        },
-      );
-    }
-
+class ApiClient {
+  ApiClient({Dio? dio}) : _dio = dio ?? Dio() {
     _dio.options
       ..baseUrl = ApiConstants.baseUrl
       ..connectTimeout = ApiConstants.connectTimeout
@@ -30,50 +18,45 @@ class ApiClient
         Headers.contentTypeHeader: Headers.jsonContentType,
       };
 
-    if (kDebugMode)
-    {
+    if (kDebugMode) {
       _dio.interceptors.add(
-        LogInterceptor(requestBody: false, responseBody: false,),
+        LogInterceptor(requestBody: false, responseBody: false),
       );
     }
   }
+
   final Dio _dio;
 
   Future<dynamic> get(
-      String path, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
-    try
-    {
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    try {
       final response = await _dio.get<dynamic>(
         path,
         queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
       );
+
       return response.data;
-    }
-    on DioException catch (error)
-    {
+    } on DioException catch (error) {
       throw _mapDioException(error);
-    }
-    on FormatException catch (error)
-    {
+    } on FormatException catch (error) {
       throw ParsingException(cause: error);
     }
   }
 
   Future<dynamic> post(
-      String path, {
-        Object? data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
-    try
-    {
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    try {
       final response = await _dio.post<dynamic>(
         path,
         data: data,
@@ -83,24 +66,15 @@ class ApiClient
       );
 
       return response.data;
-    }
-    on DioException catch (error) {
+    } on DioException catch (error) {
       throw _mapDioException(error);
-    }
-    on FormatException catch (error) {
+    } on FormatException catch (error) {
       throw ParsingException(cause: error);
     }
   }
 
-  AppException _mapDioException(DioException error)
-  {
-    debugPrint('Dio type: ${error.type}');
-    debugPrint('Dio error: ${error.error}');
-    debugPrint('Dio message: ${error.message}');
-    debugPrint('Dio uri: ${error.requestOptions.uri}');
-
-    switch (error.type)
-    {
+  AppException _mapDioException(DioException error) {
+    switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
@@ -108,10 +82,7 @@ class ApiClient
         return RequestTimeoutException(cause: error);
 
       case DioExceptionType.connectionError:
-        return NetworkException(
-          message: 'Could not connect to the API server.',
-          cause: error,
-        );
+        return NetworkException(cause: error);
 
       case DioExceptionType.badCertificate:
         return NetworkException(
@@ -129,18 +100,8 @@ class ApiClient
         );
 
       case DioExceptionType.unknown:
-        if (error.error is HandshakeException) {
-          return NetworkException(
-            message: 'TLS handshake failed while connecting to the API.',
-            cause: error,
-          );
-        }
-
         if (error.error is SocketException) {
-          return NetworkException(
-            message: 'Network connection failed.',
-            cause: error,
-          );
+          return NetworkException(cause: error);
         }
 
         return UnknownApiException(cause: error);
@@ -162,10 +123,7 @@ class ApiClient
       case 502:
       case 503:
       case 504:
-        return ServerException(
-          statusCode: statusCode,
-          cause: error,
-        );
+        return ServerException(statusCode: statusCode, cause: error);
 
       default:
         return UnknownApiException(

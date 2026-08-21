@@ -6,9 +6,14 @@ import 'app.dart';
 import 'core/api/api_client.dart';
 import 'core/observer/app_bloc_observer.dart';
 import 'core/storage/local_storage_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   Bloc.observer = const AppBlocObserver();
 
