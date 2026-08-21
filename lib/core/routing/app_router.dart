@@ -1,27 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/navigation/presentation/screens/main_shell.dart';
-import '../../features/checkout/screen/checkout_screen.dart';
-import '../../features/checkout/screen/order_history_screen.dart';
-import '../../features/checkout/screen/order_success.dart';
-import '../../features/profile/screens/profile_screen.dart';
-import '../../features/cart/logic/cart/cart_screen.dart';
-import '../../features/productdetailed/product_detail_screen.dart';
-import '../../models/product_model.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
-
   errorBuilder: (context, state) {
     return _PlaceholderScreen(
       title: 'Page not found',
       message: state.error?.toString(),
     );
   },
-
   routes: [
     GoRoute(
       path: AppRoutes.splash,
@@ -29,74 +21,45 @@ final GoRouter appRouter = GoRouter(
         return const SplashScreen();
       },
     ),
-
     GoRoute(
       path: AppRoutes.login,
       builder: (context, state) {
         return const LoginScreen();
       },
     ),
-
     GoRoute(
       path: AppRoutes.home,
       builder: (context, state) {
         return const MainShell();
       },
     ),
-
     GoRoute(
       path: AppRoutes.productDetails,
       builder: (context, state) {
-        final product = state.extra as ProductModel;
+        final productId = state.pathParameters['productId'];
 
-        return ProductDetailScreen(
-          id: product.id,
-          title: product.title,
-          price: double.parse(product.price),
-          imageUrl: product.imageUrl,
-          description: product.description,
-          stockStatus: product.stockStatus,
+        return _PlaceholderScreen(
+          title: 'Product details',
+          message: 'Product ID: $productId',
         );
       },
     ),
-
     GoRoute(
       path: AppRoutes.cart,
       builder: (context, state) {
-        return CartScreen(
-          onStartShopping: () {
-            context.go(AppRoutes.home);
-          },
-        );
+        return const _PlaceholderScreen(title: 'Cart');
       },
     ),
-
     GoRoute(
       path: AppRoutes.checkout,
       builder: (context, state) {
-        return const CheckoutScreen();
+        return const _PlaceholderScreen(title: 'Checkout');
       },
     ),
-
-    GoRoute(
-      path: AppRoutes.orderSuccess,
-      builder: (context, state) {
-        final orderId = state.uri.queryParameters['orderId'] ?? '';
-        return OrderSuccessScreen(orderId: orderId);
-      },
-    ),
-
     GoRoute(
       path: AppRoutes.profile,
       builder: (context, state) {
-        return const ProfileScreen();
-      },
-    ),
-
-    GoRoute(
-      path: AppRoutes.orderHistory,
-      builder: (context, state) {
-        return const OrderHistoryScreen();
+        return const _PlaceholderScreen(title: 'Profile');
       },
     ),
   ],
@@ -104,6 +67,7 @@ final GoRouter appRouter = GoRouter(
 
 class _PlaceholderScreen extends StatelessWidget {
   const _PlaceholderScreen({required this.title, this.message});
+
   final String title;
   final String? message;
 

@@ -2,32 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_routes.dart';
-import '../../../../core/storage/local_storage_service.dart';
 import '../../../features/cart/logic/cart/cart_cubit.dart';
+import '../../../features/cart/logic/cart/cart_item.dart';
 import '../../../features/cart/logic/cart/cart_state.dart';
-import '../../cart/logic/cart/cart_item.dart';
-import '../../checkout/data/order_local_storge.dart';
-import '../../checkout/models/order_model.dart';
-import '../widget/order_summary.dart';
-import '../widget/payment.dart';
-import '../widget/shipping_form.dart';
 
-class CheckoutScreen extends StatefulWidget {
+class CheckoutScreen extends StatefulWidget
+{
   const CheckoutScreen({super.key});
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckoutScreenState extends State<CheckoutScreen> {
+class _CheckoutScreenState extends State<CheckoutScreen>
+{
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _postalCodeController = TextEditingController();
+
   String _paymentMethod = 'Cash on Delivery';
   bool _isPlacingOrder = false;
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -37,117 +33,202 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _postalCodeController.dispose();
     super.dispose();
   }
+ //validation
+  String? _requiredValidator(String? value, String fieldName,)
+  {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
 
+    return null;
+  }
+
+  String? _phoneValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Phone number is required';
+    }
+
+    if (!RegExp(r'^[0-9]{11}$').hasMatch(value.trim())) {
+      return 'Enter a valid 11-digit phone number';
+    }
+
+    return null;
+  }
+
+  String? _postalCodeValidator(String? value)
+  {
+    if (value == null || value.trim().isEmpty) {
+      return 'Postal code is required';
+    }
+
+    if (!RegExp(r'^[0-9]+$').hasMatch(value.trim())) {
+      return 'Enter a valid postal code';
+    }
+
+    return null;
+  }
+
+  // place order
   Future<void> _placeOrder() async {
-    final cartCubit = context.read<CartCubit>();
-    final cartState = cartCubit.state;
-
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    final cartState = context.read<CartCubit>().state;
     if (cartState.items.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Your cart is empty.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your cart is empty.'),),
+      );
       return;
     }
 
-    setState(() {
-      _isPlacingOrder = true;
-    });
+    setState(() {_isPlacingOrder = true;});
+
+
+    final orderId = 'ORD-${DateTime.now().millisecondsSinceEpoch}';
+
     try {
-      final order = Order(
-        orderId: 'ORD-${DateTime.now().millisecondsSinceEpoch}',
-        date: DateTime.now(),
-        items: List<CartItem>.from(cartState.items),
-        totalPrice: cartState.grandTotal,
-        fullName: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        address: _addressController.text.trim(),
-        city: _cityController.text.trim(),
-        postalCode: _postalCodeController.text.trim(),
-        paymentMethod: _paymentMethod,
-      );
+      await context.read<CartCubit>().clearCart();
+      if (!mounted) return;
 
-      final storage = context.read<LocalStorageService>();
-      final orderStorage = OrderLocalStorage(storage);
-      await orderStorage.saveOrder(order);
-      await cartCubit.clearCart();
-
-      if (!mounted) {
-        return;
-      }
-      context.go(AppRoutes.orderSuccessLocation(order.orderId));
+      setState(() {_isPlacingOrder = false;});
+      await _showOrderSuccessDialog(orderId);
     }
-    catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _isPlacingOrder = false;
-      });
+    catch (_)
+    {
+      if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not place order: $error')));
+      setState(() {_isPlacingOrder = false;});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong. Please try again.',),),
+      );
     }
   }
 
+ //success
+  Future<void> _showOrderSuccessDialog(String orderId,) async
+  {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Order Placed Successfully',),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, size: 70, color: Colors.green,),
+              const SizedBox(height: 16),
+
+              const Text('Your order has been placed successfully.', textAlign: TextAlign.center,),
+              const SizedBox(height: 12),
+
+              Text(
+                'Order ID:\n$orderId',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold,),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.go(AppRoutes.home);
+              },
+              child: const Text('Back to Home'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // input
+  InputDecoration _inputDecoration(String label, IconData icon,)
+  {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12),),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Checkout')),
+          appBar: AppBar(title: const Text('Checkout'),),
           body: Form(
             key: _formKey,
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
+
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Order Summary',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+
+                  const Text('Order Summary', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),),
                   const SizedBox(height: 12),
 
-                  OrderSummary(
-                    items: cartState.items,
-                    subtotal: cartState.subtotal,
-                    tax: cartState.tax,
-                    shipping: cartState.shipping,
-                  ),
+                  _buildOrderSummary(cartState),
                   const SizedBox(height: 28),
 
-                  const Text(
-                    'Shipping Address',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  const Text('Shipping Address', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    controller: _nameController,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration('Full Name', Icons.person_outline,),
+                    validator: (value) => _requiredValidator(value, 'Full name',),
                   ),
                   const SizedBox(height: 12),
 
-                  ShippingForm(
-                    nameController: _nameController,
-                    phoneController: _phoneController,
-                    addressController: _addressController,
-                    cityController: _cityController,
-                    postalCodeController: _postalCodeController,
+                  TextFormField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration('Phone Number', Icons.phone_outlined,),
+                    validator: _phoneValidator,
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    controller: _addressController,
+                    maxLines: 2,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration('Address', Icons.location_on_outlined,),
+                    validator: (value) => _requiredValidator(value, 'Address',),
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    controller: _cityController,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration('City', Icons.location_city_outlined,),
+                    validator: (value) => _requiredValidator(value, 'City',),
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextFormField(
+                    controller: _postalCodeController,
+                    keyboardType: TextInputType.number,
+                    decoration: _inputDecoration('Postal Code', Icons.markunread_mailbox_outlined,),
+                    validator: _postalCodeValidator,
                   ),
                   const SizedBox(height: 28),
 
                   const Text(
                     'Payment Method',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
                   ),
                   const SizedBox(height: 12),
 
-                  PaymentMethod(
-                    selectedMethod: _paymentMethod,
-                    onChanged: (value) {
-                      setState(() {_paymentMethod = value;});
-                    },
-                  ),
+                  _buildPaymentMethod(),
                   const SizedBox(height: 30),
 
                   SizedBox(
@@ -155,13 +236,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     height: 54,
                     child: ElevatedButton(
                       onPressed: _isPlacingOrder || cartState.items.isEmpty ? null : _placeOrder,
-
-                      child: _isPlacingOrder
-                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2),)
-                          : Text(
-                              'Place Order - \$${cartState.grandTotal.toStringAsFixed(2)}',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold,),
-                            ),
+                      child: _isPlacingOrder ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2,),
+                      )
+                      :Text(
+                        'Place Order - \$${cartState.grandTotal.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold,),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -171,6 +254,157 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildOrderSummary(CartState cartState,)
+  {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            if (cartState.items.isNotEmpty)
+              ...cartState.items.map((item) => _buildCartItem(item),),
+
+            if (cartState.items.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('Your cart is empty.',),
+              ),
+            const Divider(height: 24),
+
+            _buildPriceRow('Subtotal', cartState.subtotal,),
+            const SizedBox(height: 10),
+
+            _buildPriceRow('Tax', cartState.tax,),
+            const SizedBox(height: 10),
+
+            _buildShippingRow(cartState.shipping,),
+            const Divider(height: 24),
+
+            _buildPriceRow('Grand Total', cartState.grandTotal, isTotal: true,),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartItem(CartItem item,)
+  {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12,),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius:
+            BorderRadius.circular(8),
+            child: Image.network(item.imageUrl, width: 55, height: 55,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _)
+              {
+                return Container(
+                  width: 55, height: 55,
+                  color: Colors.grey.shade200,
+                  child: const Icon(Icons.image_not_supported,),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w600,),
+                ),
+                const SizedBox(height: 4),
+
+                Text('Qty: ${item.quantity}', style: TextStyle(color: Colors.grey.shade600,),),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          Text(
+            '\$${item.totalPrice.toStringAsFixed(2)}',
+            style: const TextStyle(fontWeight: FontWeight.bold,),
+          ),
+        ],
+      ),
+    );
+  }
+// price row
+  Widget _buildPriceRow(String title, double price, {bool isTotal = false,})
+  {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: isTotal ? 18 : 15,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+
+        Text(
+          '\$${price.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontSize: isTotal ? 18 : 15,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShippingRow(double shipping,) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text('Shipping', style: TextStyle(fontSize: 15,),),
+        Text(
+          shipping == 0 ? 'Free' : '\$${shipping.toStringAsFixed(2)}',
+          style: const TextStyle(fontSize: 15,),
+        ),
+      ],
+    );
+  }
+
+  // payment
+  Widget _buildPaymentMethod() {
+    return Card(
+      child: Column(
+        children: [
+          RadioListTile<String>(
+            title: const Text('Cash on Delivery'),
+            value: 'Cash on Delivery',
+            groupValue: _paymentMethod,
+            onChanged: (value)
+            {
+              if (value == null) return;
+              setState(() {_paymentMethod = value;});
+            },
+          ),
+
+          RadioListTile<String>(
+            title: const Text('Credit Card'),
+            value: 'Credit Card',
+            groupValue: _paymentMethod,
+            onChanged: (value)
+            {
+              if (value == null) return;
+              setState(() {_paymentMethod = value;});
+            },
+          ),
+        ],
+      ),
     );
   }
 }
