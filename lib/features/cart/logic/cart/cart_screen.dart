@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../checkout/screen/checkout_screen.dart';
 import 'cart_cubit.dart';
 import 'cart_state.dart';
 import 'cart_item.dart';
@@ -290,10 +291,8 @@ class _CartSummary extends StatelessWidget {
               height: 52,
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Checkout screen will be connected soon.'),
-                    ),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const CheckoutScreen()),
                   );
                 },
                 child: const Text(
