@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/quantity_cubit.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/wishlist_cubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/QuantityCubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/WishlistCubit.dart';
 import 'package:e_commerce_project/features/cart/logic/cart/cart_cubit.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -64,6 +64,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Product Image
                 Center(
                   child: Image.network(
                     widget.imageUrl,
@@ -93,6 +94,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+                // Product Details
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -147,6 +149,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Stock
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 15,
@@ -193,6 +196,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
       ),
+      // Bottom Bar
+      // Bottom Bar
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
         decoration: BoxDecoration(
@@ -210,6 +215,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Price
               Expanded(
                 child: Text(
                   '\$${widget.price}',
@@ -220,6 +226,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
+              // Quantity
               Container(
                 height: 50,
                 decoration: BoxDecoration(
@@ -266,6 +273,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               const SizedBox(width: 15),
+              // Cart Button
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
