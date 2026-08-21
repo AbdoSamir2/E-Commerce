@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/routing/app_routes.dart';
-import '../../../../core/storage/local_storage_service.dart';
+import '../../logic/auth_cubit.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,16 +20,17 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    final storage = context.read<LocalStorageService>();
+    final authCubit = context.read<AuthCubit>();
 
     await Future<void>.delayed(const Duration(seconds: 3));
-    final token = await storage.getString(StorageKeys.authToken);
+
+    authCubit.checkAuthStatus();
 
     if (!mounted) {
       return;
     }
 
-    final destination = token?.isNotEmpty == true
+    final destination = authCubit.state.isLoggedIn
         ? AppRoutes.home
         : AppRoutes.login;
     context.go(destination);

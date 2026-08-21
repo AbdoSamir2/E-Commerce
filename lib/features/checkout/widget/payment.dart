@@ -11,13 +11,14 @@ class PaymentMethod extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Card(
       child: RadioGroup<String>(
         groupValue: selectedMethod,
         onChanged: (value) {
-          if (value != null) {onChanged(value);}
+          if (value != null) {
+            onChanged(value);
+          }
         },
         child: const Column(
           children: [

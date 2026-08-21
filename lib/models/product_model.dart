@@ -16,47 +16,38 @@ class ProductModel {
     this.description = 'No description available.',
     this.stockStatus = 'In stock',
   });
-}
 
-final List<ProductModel> dummyProducts = [
-  ProductModel(
-    id: 'prod_1',
-    title: 'Wireless Headphones',
-    price: '99.99',
-    imageUrl: 'https://picsum.photos/200/300?random=1',
-    rating: 4.8,
-    description:
-        'Experience true wireless freedom with these noise-canceling headphones. Up to 20 hours of battery life.',
-    stockStatus: 'In stock',
-  ),
-  ProductModel(
-    id: 'prod_2',
-    title: 'Smart Watch Series 7',
-    price: '149.50',
-    imageUrl: 'https://picsum.photos/200/300?random=2',
-    rating: 4.6,
-    description:
-        'A sleek and classic smart watch to keep track of your daily activities and notifications. Water-resistant and durable.',
-    stockStatus: 'In stock',
-  ),
-  ProductModel(
-    id: 'prod_3',
-    title: 'Nike Running Shoes',
-    price: '79.00',
-    imageUrl: 'https://picsum.photos/200/300?random=3',
-    rating: 4.3,
-    description:
-        'Lightweight running shoes designed for comfort and performance on every run.',
-    stockStatus: 'Out of stock',
-  ),
-  ProductModel(
-    id: 'prod_4',
-    title: 'Casual Winter Jacket',
-    price: '120.00',
-    imageUrl: 'https://picsum.photos/200/300?random=4',
-    rating: 4.7,
-    description:
-        'A warm and stylish winter jacket to keep you comfortable in cold weather.',
-    stockStatus: 'In stock',
-  ),
-];
+  factory ProductModel.fromMap(String id, Map<String, dynamic> data) {
+    return ProductModel(
+      id: id,
+      title: (data['title'] as Object?)?.toString() ?? 'Untitled product',
+      price: _readPrice(data['price']),
+      imageUrl: (data['imageUrl'] as Object?)?.toString() ?? '',
+      rating: (data['rating'] as num?)?.toDouble() ?? 4.5,
+      description:
+          (data['description'] as Object?)?.toString() ??
+          'No description available.',
+      stockStatus: (data['stockStatus'] as Object?)?.toString() ?? 'In stock',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'price': double.tryParse(price) ?? 0.0,
+      'imageUrl': imageUrl,
+      'rating': rating,
+      'description': description,
+      'stockStatus': stockStatus,
+    };
+  }
+
+  static String _readPrice(Object? value) {
+    if (value is num) {
+      return value.toStringAsFixed(2);
+    }
+
+    return double.tryParse(value?.toString() ?? '')?.toStringAsFixed(2) ??
+        '0.00';
+  }
+}

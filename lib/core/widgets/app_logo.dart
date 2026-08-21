@@ -17,7 +17,7 @@ class AppLogo extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color:  primaryColor.withValues(alpha: 0.12),
+            color: primaryColor.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
@@ -27,7 +27,7 @@ class AppLogo extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-       
+
         RichText(
           text: TextSpan(
             style: TextStyle(

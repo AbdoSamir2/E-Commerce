@@ -64,7 +64,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Image
                 Center(
                   child: Image.network(
                     widget.imageUrl,
@@ -94,7 +93,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                // Product Details
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -103,7 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.title, // هنا الاسم الحقيقي
+                            widget.title,
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -149,7 +147,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                // Stock
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 15,
@@ -162,7 +159,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     borderRadius: BorderRadius.circular(38),
                   ),
                   child: Text(
-                    widget.stockStatus, // حالة المخزون الحقيقية
+                    widget.stockStatus,
                     style: TextStyle(
                       color: widget.stockStatus.toLowerCase() == 'in stock'
                           ? Colors.green
@@ -183,7 +180,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  widget.description, // الوصف الحقيقي
+                  widget.description,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -196,8 +193,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
       ),
-      // Bottom Bar
-      // Bottom Bar
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
         decoration: BoxDecoration(
@@ -215,7 +210,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Price
               Expanded(
                 child: Text(
                   '\$${widget.price}',
@@ -226,7 +220,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
-              // Quantity
               Container(
                 height: 50,
                 decoration: BoxDecoration(
@@ -242,7 +235,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
                             minWidth: 40,
-                            minHeight: 40, // ضيف السطر ده هنا
+                            minHeight: 40,
                           ),
                           onPressed: () {
                             context.read<QuantityCubit>().decrement();
@@ -260,7 +253,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
                             minWidth: 40,
-                            minHeight: 40, // وضيف السطر ده هنا كمان
+                            minHeight: 40,
                           ),
                           onPressed: () {
                             context.read<QuantityCubit>().increment();
@@ -273,7 +266,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               const SizedBox(width: 15),
-              // Cart Button
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
@@ -281,7 +273,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 25),
-                    minimumSize: const Size(64, 40), // <-- ضيف السطر ده
+                    minimumSize: const Size(64, 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),

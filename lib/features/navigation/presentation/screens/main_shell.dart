@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../cart/logic/cart/cart_screen.dart';
+import '../../../catalog/home_screen.dart';
+import '../../../checkout/screen/profile.dart';
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -11,10 +15,10 @@ class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
   static const _screens = <Widget>[
-    Center(child: Text('Home Screen')),
+    HomeScreen(),
     Center(child: Text('Categories Screen')),
-    Center(child: Text('Cart Screen')),
-    Center(child: Text('Profile Screen')),
+    CartScreen(),
+    ProfileScreen(),
   ];
 
   @override

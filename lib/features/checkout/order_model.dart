@@ -1,5 +1,4 @@
-class Order
-{
+class Order {
   final String orderId;
   final DateTime date;
   final double totalPrice;

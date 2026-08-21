@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/product_model.dart';
 import '../catalog/home_widgets/product_card.dart';
+import '../catalog/logic/product_cubit.dart';
 import '../cart/logic/cart/cart_cubit.dart';
 import '../productdetailed/Logic/quantity_cubit.dart';
 import '../productdetailed/Logic/wishlist_cubit.dart';
@@ -27,9 +28,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Future<void> _loadFavorites() async {
+    final products = context.read<ProductCubit>().state.products;
     final prefs = await SharedPreferences.getInstance();
 
-    final favorites = dummyProducts.where((product) {
+    final favorites = products.where((product) {
       return prefs.getBool('favorite_${product.id}') ?? false;
     }).toList();
 

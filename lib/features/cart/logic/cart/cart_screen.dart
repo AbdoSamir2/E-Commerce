@@ -12,11 +12,10 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<CartCubit, CartState>(
       listener: (context, state) {
-        if (state.status == CartStatus.failure &&
-            state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+        if (state.status == CartStatus.failure && state.errorMessage != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         }
       },
       builder: (context, state) {
@@ -209,10 +208,7 @@ class _CartItemCard extends StatelessWidget {
 }
 
 class _QuantityButton extends StatelessWidget {
-  const _QuantityButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _QuantityButton({required this.icon, required this.onPressed});
 
   final IconData icon;
   final VoidCallback onPressed;
@@ -228,11 +224,7 @@ class _QuantityButton extends StatelessWidget {
         child: SizedBox(
           width: 30,
           height: 28,
-          child: Icon(
-            icon,
-            size: 18,
-            color: Theme.of(context).primaryColor,
-          ),
+          child: Icon(icon, size: 18, color: Theme.of(context).primaryColor),
         ),
       ),
     );
@@ -306,10 +298,7 @@ class _CartSummary extends StatelessWidget {
                 },
                 child: const Text(
                   'Proceed to Checkout',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -385,10 +374,7 @@ class _EmptyCartView extends StatelessWidget {
             const SizedBox(height: 22),
             const Text(
               'Your cart is empty',
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
