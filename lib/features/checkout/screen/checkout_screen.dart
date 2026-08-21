@@ -380,30 +380,26 @@ class _CheckoutScreenState extends State<CheckoutScreen>
   // payment
   Widget _buildPaymentMethod() {
     return Card(
-      child: Column(
-        children: [
-          RadioListTile<String>(
-            title: const Text('Cash on Delivery'),
-            value: 'Cash on Delivery',
-            groupValue: _paymentMethod,
-            onChanged: (value)
-            {
-              if (value == null) return;
-              setState(() {_paymentMethod = value;});
-            },
-          ),
+      child: RadioGroup<String>(
+        groupValue: _paymentMethod,
+        onChanged: (value)
+        {
+          if (value == null) return;
+          setState(() {_paymentMethod = value;});
+        },
+        child: const Column(
+          children: [
+            RadioListTile<String>(
+              title: Text('Cash on Delivery'),
+              value: 'Cash on Delivery',
+            ),
 
-          RadioListTile<String>(
-            title: const Text('Credit Card'),
-            value: 'Credit Card',
-            groupValue: _paymentMethod,
-            onChanged: (value)
-            {
-              if (value == null) return;
-              setState(() {_paymentMethod = value;});
-            },
-          ),
-        ],
+            RadioListTile<String>(
+              title: Text('Credit Card'),
+              value: 'Credit Card',
+            ),
+          ],
+        ),
       ),
     );
   }

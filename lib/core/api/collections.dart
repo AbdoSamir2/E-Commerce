@@ -1,69 +1,70 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 Future<void> getProducts() async {
   try {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('products').get();
     for (var doc in snapshot.docs) {
-      print('Product: ${doc.data()}');
+      debugPrint('Product: ${doc.data()}');
     }
   } catch (e) {
-    print('Error fetching products: $e');
+    debugPrint('Error fetching products: $e');
   }
 }
 Future<void> addProduct(Map<String, dynamic> productData) async {
   try {
     await FirebaseFirestore.instance.collection('products').add(productData);
-    print('Product added successfully.');
+    debugPrint('Product added successfully.');
   } catch (e) {
-    print('Error adding product: $e');
+    debugPrint('Error adding product: $e');
   }
 }
 Future<void> updateProduct(String documentId, Map<String, dynamic> productData) async {
   try {
     await FirebaseFirestore.instance.collection('products').doc(documentId).update(productData);
-    print('Product updated successfully.');
+    debugPrint('Product updated successfully.');
   } catch (e) {
-    print('Error updating product: $e');
+    debugPrint('Error updating product: $e');
   }
 }
 Future<void> deleteProduct(String documentId) async {
   try {
     await FirebaseFirestore.instance.collection('products').doc(documentId).delete();
-    print('Product deleted successfully.');
+    debugPrint('Product deleted successfully.');
   } catch (e) {
-    print('Error deleting product: $e');
+    debugPrint('Error deleting product: $e');
   }
 }
 Future<void> getUsers() async {
   try {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('users').get();
     for (var doc in snapshot.docs) {
-      print('User: ${doc.data()}');
+      debugPrint('User: ${doc.data()}');
     }
   } catch (e) {
-    print('Error fetching users: $e');
+    debugPrint('Error fetching users: $e');
   }
 }
 Future<void> addUser(Map<String, dynamic> userData) async {
   try {
     await FirebaseFirestore.instance.collection('users').add(userData);
-    print('User added successfully.');
+    debugPrint('User added successfully.');
   } catch (e) {
-    print('Error adding user: $e');
+    debugPrint('Error adding user: $e');
   }
 }
 Future<void> updateUser(String documentId, Map<String, dynamic> userData) async {
   try {
     await FirebaseFirestore.instance.collection('users').doc(documentId).update(userData);
-    print('User updated successfully.');
+    debugPrint('User updated successfully.');
   } catch (e) {
-    print('Error updating user: $e');
+    debugPrint('Error updating user: $e');
   }
 }
 Future<void> deleteUser(String documentId) async {
   try {
     await FirebaseFirestore.instance.collection('users').doc(documentId).delete();
-    print('User deleted successfully.');
+    debugPrint('User deleted successfully.');
   } catch (e) {
-    print('Error deleting user: $e');
+    debugPrint('Error deleting user: $e');
   }
 }
