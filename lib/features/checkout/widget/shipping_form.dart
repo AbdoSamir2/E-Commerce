@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ShippingForm extends StatelessWidget
-{
+class ShippingForm extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController phoneController;
   final TextEditingController addressController;
@@ -16,10 +15,7 @@ class ShippingForm extends StatelessWidget
     required this.postalCodeController,
   });
 
-  String? _required(
-      String? value,
-      String fieldName,)
-  {
+  String? _required(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';
     }
@@ -27,8 +23,7 @@ class ShippingForm extends StatelessWidget
     return null;
   }
 
-  String? _phoneValidator(String? value)
-  {
+  String? _phoneValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Phone number is required';
     }
@@ -39,8 +34,7 @@ class ShippingForm extends StatelessWidget
     return null;
   }
 
-  String? _postalCodeValidator(String? value)
-  {
+  String? _postalCodeValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Postal code is required';
     }
@@ -51,29 +45,22 @@ class ShippingForm extends StatelessWidget
     return null;
   }
 
-  InputDecoration _decoration(
-      String label,
-      IconData icon,
-      )
-  {
+  InputDecoration _decoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Column(
       children: [
         TextFormField(
           controller: nameController,
           textInputAction: TextInputAction.next,
-          decoration: _decoration('Full Name', Icons.person_outline,),
+          decoration: _decoration('Full Name', Icons.person_outline),
           validator: (value) => _required(value, 'Full name'),
         ),
         const SizedBox(height: 12),
@@ -82,7 +69,7 @@ class ShippingForm extends StatelessWidget
           controller: phoneController,
           keyboardType: TextInputType.phone,
           textInputAction: TextInputAction.next,
-          decoration: _decoration('Phone Number', Icons.phone_outlined,),
+          decoration: _decoration('Phone Number', Icons.phone_outlined),
           validator: _phoneValidator,
         ),
         const SizedBox(height: 12),
@@ -91,7 +78,7 @@ class ShippingForm extends StatelessWidget
           controller: addressController,
           maxLines: 2,
           textInputAction: TextInputAction.next,
-          decoration: _decoration('Address', Icons.location_on_outlined,),
+          decoration: _decoration('Address', Icons.location_on_outlined),
           validator: (value) => _required(value, 'Address'),
         ),
         const SizedBox(height: 12),
@@ -99,7 +86,7 @@ class ShippingForm extends StatelessWidget
         TextFormField(
           controller: cityController,
           textInputAction: TextInputAction.next,
-          decoration: _decoration('City', Icons.location_city_outlined,),
+          decoration: _decoration('City', Icons.location_city_outlined),
           validator: (value) => _required(value, 'City'),
         ),
         const SizedBox(height: 12),
@@ -107,7 +94,10 @@ class ShippingForm extends StatelessWidget
         TextFormField(
           controller: postalCodeController,
           keyboardType: TextInputType.number,
-          decoration: _decoration('Postal Code', Icons.markunread_mailbox_outlined,),
+          decoration: _decoration(
+            'Postal Code',
+            Icons.markunread_mailbox_outlined,
+          ),
           validator: _postalCodeValidator,
         ),
       ],

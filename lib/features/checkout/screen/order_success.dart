@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 
-class OrderSuccessScreen extends StatelessWidget
-{
+class OrderSuccessScreen extends StatelessWidget {
   final String orderId;
-  const OrderSuccessScreen({
-    super.key,
-    required this.orderId,
-  });
+  const OrderSuccessScreen({super.key, required this.orderId});
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Padding(
@@ -18,19 +13,22 @@ class OrderSuccessScreen extends StatelessWidget
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.check_circle, size: 100, color: Colors.green,),
+              const Icon(Icons.check_circle, size: 100, color: Colors.green),
               const SizedBox(height: 24),
               const Text(
                 'Order Placed Successfully!',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 12),
 
               Text(
                 'Order ID: $orderId',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600,),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
 
               const SizedBox(height: 32),
@@ -40,7 +38,7 @@ class OrderSuccessScreen extends StatelessWidget
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.popUntil(context, (route) => route.isFirst,);
+                    Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   child: const Text('Back to Home'),
                 ),

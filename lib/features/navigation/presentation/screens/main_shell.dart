@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../cart/logic/cart/cart_screen.dart';
+import '../../../catalog/home_screen.dart';
+import '../../../checkout/screen/profile.dart';
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -10,19 +14,23 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  static const _screens = <Widget>[
-    Center(child: Text('Home Screen')),
-    Center(child: Text('Categories Screen')),
-    Center(child: Text('Cart Screen')),
-    Center(child: Text('Profile Screen')),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screens = <Widget>[
+      const HomeScreen(),
+      CartScreen(
+        onStartShopping: () {
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
+      const ProfileScreen(),
+    ];
 
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: IndexedStack(index: _currentIndex, children: screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -39,11 +47,6 @@ class _MainShellState extends State<MainShell> {
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined),
-            activeIcon: Icon(Icons.grid_view_rounded),
-            label: 'Categories',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart_outlined),

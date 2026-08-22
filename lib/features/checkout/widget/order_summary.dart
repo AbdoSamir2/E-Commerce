@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class OrderSummary extends StatelessWidget
-{
+class OrderSummary extends StatelessWidget {
   final double subtotal;
   final double tax;
   final double shipping;
@@ -15,8 +14,7 @@ class OrderSummary extends StatelessWidget
   double get total => subtotal + tax + shipping;
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -28,18 +26,14 @@ class OrderSummary extends StatelessWidget
             const SizedBox(height: 10),
             _priceRow('Shipping', shipping),
             const Divider(height: 24),
-            _priceRow('Grand Total', total, isTotal: true,),
+            _priceRow('Grand Total', total, isTotal: true),
           ],
         ),
       ),
     );
   }
 
-  Widget _priceRow(
-      String title,
-      double price, {bool isTotal = false,}
-      )
-  {
+  Widget _priceRow(String title, double price, {bool isTotal = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -58,7 +52,6 @@ class OrderSummary extends StatelessWidget
           ),
         ),
       ],
-
     );
   }
 }

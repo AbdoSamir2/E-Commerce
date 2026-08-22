@@ -37,11 +37,13 @@ class CartItem {
   }
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
+    final quantity = (json['quantity'] as num?)?.toInt() ?? 1;
+
     return CartItem(
       title: json['title'] as String,
       price: (json['price'] as num).toDouble(),
       imageUrl: json['imageUrl'] as String,
-      quantity: json['quantity'] as int? ?? 1,
+      quantity: quantity < 1 ? 1 : quantity,
     );
   }
 }

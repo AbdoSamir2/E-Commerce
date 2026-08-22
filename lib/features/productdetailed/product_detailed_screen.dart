@@ -1,33 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/QuantityCubit.dart';
-import 'package:e_commerce_project/features/productdetailed/Logic/WishlistCubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/quantity_cubit.dart';
+import 'package:e_commerce_project/features/productdetailed/Logic/wishlist_cubit.dart';
 import 'package:e_commerce_project/features/cart/logic/cart/cart_cubit.dart';
+import 'package:e_commerce_project/features/catalog/data/product_repository.dart';
+import 'package:e_commerce_project/features/catalog/logic/product_cubit.dart';
+import 'package:e_commerce_project/features/catalog/presentation/product_form_screen.dart';
+import 'package:e_commerce_project/models/product_model.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final String id;
-  final String title;
-  final double price;
-  final String imageUrl;
-  final String description;
-  final String stockStatus;
+  final ProductModel product;
 
-  const ProductDetailScreen({
-    super.key,
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.imageUrl,
-    required this.description,
-    required this.stockStatus,
-  });
+  const ProductDetailScreen({super.key, required this.product});
+
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late ProductModel _product = widget.product;
+  bool _isRefreshing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFromFirebase();
+  }
+
+  Future<void> _loadFromFirebase() async {
+    try {
+      final fresh = await context.read<ProductRepository>().fetchProductById(
+        widget.product.id,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _product = fresh;
+        _isRefreshing = false;
+      });
+    } on ProductFailure catch (failure) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isRefreshing = false;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message)));
+    }
+  }
+
+  Future<void> _editProduct() async {
+    final updated = await Navigator.of(context).push<ProductModel>(
+      MaterialPageRoute(
+        builder: (_) => ProductFormScreen(existingProduct: _product),
+      ),
+    );
+
+    if (updated == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _product = updated;
+    });
+  }
+
+  Future<void> _deleteProduct() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete product'),
+          content: Text('Remove ${_product.title} permanently?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !mounted) {
+      return;
+    }
+
+    final navigator = Navigator.of(context);
+    final wasDeleted = await context.read<ProductCubit>().deleteProduct(
+      _product.id,
+    );
+
+    if (wasDeleted && mounted) {
+      navigator.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final price = double.tryParse(_product.price) ?? 0.0;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -53,8 +136,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               );
             },
           ),
-          const SizedBox(width: 12),
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, color: Colors.black),
+            tooltip: 'Edit product',
+            onPressed: _editProduct,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.black),
+            tooltip: 'Delete product',
+            onPressed: _deleteProduct,
+          ),
+          const SizedBox(width: 4),
         ],
+        bottom: _isRefreshing
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(2),
+                child: LinearProgressIndicator(minHeight: 2),
+              )
+            : null,
       ),
       body: Center(
         child: ConstrainedBox(
@@ -64,10 +163,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Image
                 Center(
                   child: Image.network(
-                    widget.imageUrl,
+                    _product.imageUrl,
                     height: 320,
                     fit: BoxFit.contain,
                     loadingBuilder: (context, child, loadingProgress) {
@@ -94,7 +192,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                // Product Details
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -103,7 +200,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.title, // هنا الاسم الحقيقي
+                            _product.title,
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -149,22 +246,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                // Stock
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 15,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: widget.stockStatus.toLowerCase() == 'in stock'
+                    color: _product.stockStatus.toLowerCase() == 'in stock'
                         ? Colors.green.shade50
                         : Colors.red.shade50,
                     borderRadius: BorderRadius.circular(38),
                   ),
                   child: Text(
-                    widget.stockStatus, // حالة المخزون الحقيقية
+                    _product.stockStatus,
                     style: TextStyle(
-                      color: widget.stockStatus.toLowerCase() == 'in stock'
+                      color: _product.stockStatus.toLowerCase() == 'in stock'
                           ? Colors.green
                           : Colors.red,
                       fontWeight: FontWeight.bold,
@@ -183,7 +279,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  widget.description, // الوصف الحقيقي
+                  _product.description,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -196,8 +292,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
       ),
-      // Bottom Bar
-      // Bottom Bar
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
         decoration: BoxDecoration(
@@ -215,10 +309,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Price
               Expanded(
                 child: Text(
-                  '\$${widget.price}',
+                  '\$${price.toStringAsFixed(2)}',
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 24,
@@ -226,7 +319,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
-              // Quantity
               Container(
                 height: 50,
                 decoration: BoxDecoration(
@@ -242,7 +334,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
                             minWidth: 40,
-                            minHeight: 40, // ضيف السطر ده هنا
+                            minHeight: 40,
                           ),
                           onPressed: () {
                             context.read<QuantityCubit>().decrement();
@@ -260,7 +352,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
                             minWidth: 40,
-                            minHeight: 40, // وضيف السطر ده هنا كمان
+                            minHeight: 40,
                           ),
                           onPressed: () {
                             context.read<QuantityCubit>().increment();
@@ -273,7 +365,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               const SizedBox(width: 15),
-              // Cart Button
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
@@ -281,7 +372,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 25),
-                    minimumSize: const Size(64, 40), // <-- ضيف السطر ده
+                    minimumSize: const Size(64, 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -290,16 +381,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     final quantity = context.read<QuantityCubit>().state;
 
                     context.read<CartCubit>().addToCart(
-                      title: widget.title,
-                      price: widget.price,
-                      imageUrl: widget.imageUrl,
+                      title: _product.title,
+                      price: price,
+                      imageUrl: _product.imageUrl,
                       quantity: quantity,
                     );
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'تم إضافة $quantity من ${widget.title} لعربة التسوق!',
+                          'تم إضافة $quantity من ${_product.title} لعربة التسوق!',
                         ),
                         backgroundColor: Colors.green,
                         duration: const Duration(seconds: 2),

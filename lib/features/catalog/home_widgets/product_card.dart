@@ -42,9 +42,9 @@ class ProductCard extends StatelessWidget {
           children: [
             Expanded(
               child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Container(
-                    width: double.infinity,
+                  DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(16),
@@ -60,11 +60,26 @@ class ProductCard extends StatelessWidget {
                       child: Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+
+                          return const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.image_not_supported_rounded,
-                              size: 40,
-                              color: Colors.grey,
+                            const Center(
+                              child: Icon(
+                                Icons.image_not_supported_rounded,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
                             ),
                       ),
                     ),

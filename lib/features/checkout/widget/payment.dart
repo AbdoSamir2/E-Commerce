@@ -11,28 +11,27 @@ class PaymentMethod extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Card(
-      child: Column(
-        children: [
-          RadioListTile<String>(
-            title: const Text('Cash on Delivery'),
-            value: 'Cash on Delivery',
-            groupValue: selectedMethod,
-            onChanged: (value) {
-              if (value != null) {onChanged(value);}
-            },
-          ),
-          RadioListTile<String>(
-            title: const Text('Credit Card'),
-            value: 'Credit Card',
-            groupValue: selectedMethod,
-            onChanged: (value) {
-              if (value != null) {onChanged(value);}
-            },
-          ),
-        ],
+      child: RadioGroup<String>(
+        groupValue: selectedMethod,
+        onChanged: (value) {
+          if (value != null) {
+            onChanged(value);
+          }
+        },
+        child: const Column(
+          children: [
+            RadioListTile<String>(
+              title: Text('Cash on Delivery'),
+              value: 'Cash on Delivery',
+            ),
+            RadioListTile<String>(
+              title: Text('Credit Card'),
+              value: 'Credit Card',
+            ),
+          ],
+        ),
       ),
     );
   }

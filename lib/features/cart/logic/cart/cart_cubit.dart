@@ -21,19 +21,16 @@ class CartCubit extends Cubit<CartState> {
         return;
       }
 
-      final items = savedData
-          .whereType<Map>()
-          .map(
-            (item) => CartItem.fromJson(
-              Map<String, dynamic>.from(item),
-            ),
-          )
-          .toList();
+      final items = <CartItem>[];
+      for (final item in savedData.whereType<Map>()) {
+        try {
+          items.add(CartItem.fromJson(Map<String, dynamic>.from(item)));
+        } catch (_) {
+          break;
+        }
+      }
 
-      emit(CartState(
-        status: CartStatus.success,
-        items: items,
-      ));
+      emit(CartState(status: CartStatus.success, items: items));
     } catch (_) {
       emit(
         state.copyWith(
@@ -50,6 +47,10 @@ class CartCubit extends Cubit<CartState> {
     required String imageUrl,
     int quantity = 1,
   }) async {
+    if (title.trim().isEmpty || price < 0 || quantity <= 0) {
+      return;
+    }
+
     final updatedItems = [...state.items];
     final index = updatedItems.indexWhere((item) => item.title == title);
 
@@ -64,9 +65,7 @@ class CartCubit extends Cubit<CartState> {
       );
     } else {
       final item = updatedItems[index];
-      updatedItems[index] = item.copyWith(
-        quantity: item.quantity + quantity,
-      );
+      updatedItems[index] = item.copyWith(quantity: item.quantity + quantity);
     }
 
     await _saveAndEmit(updatedItems);
@@ -98,8 +97,9 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> removeFromCart(String title) async {
-    final updatedItems =
-        state.items.where((item) => item.title != title).toList();
+    final updatedItems = state.items
+        .where((item) => item.title != title)
+        .toList();
 
     await _saveAndEmit(updatedItems);
   }
@@ -121,10 +121,7 @@ class CartCubit extends Cubit<CartState> {
 
   Future<void> _saveAndEmit(List<CartItem> items) async {
     emit(
-      CartState(
-        status: CartStatus.success,
-        items: List.unmodifiable(items),
-      ),
+      CartState(status: CartStatus.success, items: List.unmodifiable(items)),
     );
 
     try {

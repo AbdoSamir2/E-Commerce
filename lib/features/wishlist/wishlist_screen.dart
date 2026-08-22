@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../models/product_model.dart';
 import '../catalog/home_widgets/product_card.dart';
 import '../cart/logic/cart/cart_cubit.dart';
-import '../productdetailed/Logic/QuantityCubit.dart';
-import '../productdetailed/Logic/WishlistCubit.dart';
-import '../productdetailed/ProductDetaildScreen.dart';
+import '../productdetailed/Logic/quantity_cubit.dart';
+import '../productdetailed/Logic/wishlist_cubit.dart';
+import '../productdetailed/product_detailed_screen.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -19,6 +20,8 @@ class WishlistScreen extends StatefulWidget {
 class _WishlistScreenState extends State<WishlistScreen> {
   bool _isLoading = true;
   List<ProductModel> _favoriteProducts = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -27,18 +30,62 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Future<void> _loadFavorites() async {
-    final prefs = await SharedPreferences.getInstance();
+    final user = _auth.currentUser;
+    if (user == null) {
+      if (!mounted) return;
+      setState(() {
+        _favoriteProducts = [];
+        _isLoading = false;
+      });
+      return;
+    }
 
-    final favorites = dummyProducts.where((product) {
-      return prefs.getBool('favorite_${product.id}') ?? false;
-    }).toList();
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('wishlist')
+          .get();
 
-    if (!mounted) return;
+      final favoriteIds = querySnapshot.docs.map((doc) => doc.id).toList();
 
-    setState(() {
-      _favoriteProducts = favorites;
-      _isLoading = false;
-    });
+      List<ProductModel> firebaseFavorites = [];
+
+      for (String id in favoriteIds) {
+        final productDoc = await _firestore
+            .collection('products')
+            .doc(id)
+            .get();
+
+        if (productDoc.exists) {
+          final data = productDoc.data() as Map<String, dynamic>;
+          firebaseFavorites.add(
+            ProductModel(
+              id: productDoc.id,
+              title: data['title'] ?? 'Unknown Product',
+              price: data['price']?.toString() ?? '0.0',
+              imageUrl: data['imageUrl'] ?? '',
+              rating: (data['rating'] ?? 4.5).toDouble(),
+              description: data['description'] ?? 'No description available.',
+              stockStatus: data['stockStatus'] ?? 'In stock',
+            ),
+          );
+        }
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _favoriteProducts = firebaseFavorites;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      debugPrint("Error loading favorites from Firebase: $e");
+    }
   }
 
   @override
@@ -90,14 +137,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                 create: (_) => WishlistCubit(product.id),
                               ),
                             ],
-                            child: ProductDetailScreen(
-                              id: product.id,
-                              title: product.title,
-                              price: double.parse(product.price.toString()),
-                              imageUrl: product.imageUrl,
-                              description: product.description,
-                              stockStatus: product.stockStatus,
-                            ),
+                            child: ProductDetailScreen(product: product),
                           ),
                         ),
                       );
