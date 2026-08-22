@@ -19,7 +19,6 @@ class _MainShellState extends State<MainShell> {
     final colorScheme = Theme.of(context).colorScheme;
     final screens = <Widget>[
       const HomeScreen(),
-      const Center(child: Text('Categories Screen')),
       CartScreen(
         onStartShopping: () {
           setState(() {
@@ -48,11 +47,6 @@ class _MainShellState extends State<MainShell> {
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined),
-            activeIcon: Icon(Icons.grid_view_rounded),
-            label: 'Categories',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart_outlined),
