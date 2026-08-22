@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/constants/storage_keys.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../cart/logic/cart/cart_cubit.dart';
 import '../../cart/logic/cart/cart_item.dart';
 import '../../cart/logic/cart/cart_state.dart';
+import '../data/order_local_storage.dart';
 import '../order_model.dart';
 import '../widget/order_summary.dart';
 import '../widget/payment.dart';
@@ -44,6 +44,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Order(
       orderId: 'ORD-${DateTime.now().millisecondsSinceEpoch}',
       date: DateTime.now(),
+      items: List<CartItem>.from(cartState.items),
       totalPrice: cartState.grandTotal,
       fullName: _nameController.text.trim(),
       phone: _phoneController.text.trim(),
@@ -52,17 +53,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       postalCode: _postalCodeController.text.trim(),
       paymentMethod: _paymentMethod,
     );
-  }
-
-  Future<void> _saveToOrderHistory(
-    LocalStorageService storage,
-    Order order,
-  ) async {
-    final saved = await storage.getJson(StorageKeys.orderHistory);
-    final history = saved is List ? List<dynamic>.from(saved) : <dynamic>[];
-
-    history.add(order.toJson());
-    await storage.saveJson(StorageKeys.orderHistory, history);
   }
 
   Future<void> _placeOrder() async {
@@ -89,7 +79,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
-      await _saveToOrderHistory(storage, order);
+      await OrderLocalStorage(storage).saveOrder(order);
       await cartCubit.clearCart();
 
       if (!mounted) {

@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/routing/app_routes.dart';
 import '../../auth/logic/auth_cubit.dart';
 import '../../auth/logic/auth_state.dart';
+import '../../profile/screens/personal_information_screen.dart';
+import 'order_history_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -74,14 +76,13 @@ class ProfileScreen extends StatelessWidget {
                   leading: const Icon(Icons.person_outline),
                   title: const Text('Personal Information'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                ),
-              ),
-
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.location_on_outlined),
-                  title: const Text('Saved Addresses'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PersonalInformationScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
 
@@ -90,6 +91,13 @@ class ProfileScreen extends StatelessWidget {
                   leading: const Icon(Icons.receipt_long_outlined),
                   title: const Text('Order History'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const OrderHistoryScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
 
