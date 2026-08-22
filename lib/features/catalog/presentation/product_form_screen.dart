@@ -169,9 +169,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       }
 
                       final parsed = Uri.tryParse(url);
+                      final isWebAddress =
+                          parsed != null &&
+                          (parsed.scheme == 'http' ||
+                              parsed.scheme == 'https') &&
+                          parsed.host.isNotEmpty;
 
-                      if (parsed == null || !parsed.hasAbsolutePath) {
-                        return 'Please enter a valid URL';
+                      if (!isWebAddress) {
+                        return 'Enter a full URL starting with http:// or https://';
                       }
 
                       return null;
