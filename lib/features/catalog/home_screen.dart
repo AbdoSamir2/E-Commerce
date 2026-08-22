@@ -3,7 +3,6 @@ import '../../core/widgets/app_logo.dart';
 import '../../core/theme/theme_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme/theme_state.dart';
-import 'home_widgets/category_item.dart';
 import 'home_widgets/section_header.dart';
 import 'home_widgets/product_card.dart';
 

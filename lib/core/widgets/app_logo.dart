@@ -36,11 +36,8 @@ class AppLogo extends StatelessWidget {
               color: textColor,
             ),
             children: [
-              const TextSpan(text: 'E comerce'),
-              TextSpan(
-                text: 'Store',
-                style: TextStyle(color: primaryColor),
-              ),
+              const TextSpan(text: 'E-comerce '),
+              TextSpan(text: 'Store'),
             ],
           ),
         ),

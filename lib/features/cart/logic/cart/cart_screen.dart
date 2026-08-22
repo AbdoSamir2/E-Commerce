@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/routing/app_routes.dart';
 import '../../../checkout/screen/checkout_screen.dart';
 import 'cart_cubit.dart';
 import 'cart_state.dart';
 import 'cart_item.dart';
 
 class CartScreen extends StatelessWidget {
-  const CartScreen({super.key});
+  const CartScreen({super.key, this.onStartShopping});
+
+  final VoidCallback? onStartShopping;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,7 @@ class CartScreen extends StatelessWidget {
           body: state.status == CartStatus.loading && state.items.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : state.items.isEmpty
-              ? const _EmptyCartView()
+              ? _EmptyCartView(onStartShopping: onStartShopping)
               : _CartItemsList(items: state.items),
           bottomNavigationBar: state.items.isEmpty
               ? null
@@ -345,7 +349,9 @@ class _SummaryRow extends StatelessWidget {
 }
 
 class _EmptyCartView extends StatelessWidget {
-  const _EmptyCartView();
+  const _EmptyCartView({this.onStartShopping});
+
+  final VoidCallback? onStartShopping;
 
   @override
   Widget build(BuildContext context) {
@@ -387,7 +393,21 @@ class _EmptyCartView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                final onStartShopping = this.onStartShopping;
+                if (onStartShopping != null) {
+                  onStartShopping();
+                  return;
+                }
+
+                final navigator = Navigator.of(context);
+                if (navigator.canPop()) {
+                  navigator.pop();
+                  return;
+                }
+
+                context.go(AppRoutes.home);
+              },
               icon: const Icon(Icons.shopping_bag_outlined),
               label: const Text('Start Shopping'),
             ),

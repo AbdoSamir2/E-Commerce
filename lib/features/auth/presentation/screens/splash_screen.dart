@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuthAndNavigate() async {
     final authCubit = context.read<AuthCubit>();
 
-    await Future<void>.delayed(const Duration(seconds: 3));
+    await Future<void>.delayed(const Duration(seconds: 1));
 
     authCubit.checkAuthStatus();
 
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
             left: 0,
             right: 0,
             child: Text(
-              'E-Commerce App v1.0',
+              'E-Commerce App v1.2',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white70,

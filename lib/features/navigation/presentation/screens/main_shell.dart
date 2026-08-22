@@ -14,19 +14,24 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  static const _screens = <Widget>[
-    HomeScreen(),
-    Center(child: Text('Categories Screen')),
-    CartScreen(),
-    ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screens = <Widget>[
+      const HomeScreen(),
+      const Center(child: Text('Categories Screen')),
+      CartScreen(
+        onStartShopping: () {
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
+      const ProfileScreen(),
+    ];
 
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: IndexedStack(index: _currentIndex, children: screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

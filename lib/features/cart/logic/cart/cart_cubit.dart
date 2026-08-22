@@ -21,10 +21,14 @@ class CartCubit extends Cubit<CartState> {
         return;
       }
 
-      final items = savedData
-          .whereType<Map>()
-          .map((item) => CartItem.fromJson(Map<String, dynamic>.from(item)))
-          .toList();
+      final items = <CartItem>[];
+      for (final item in savedData.whereType<Map>()) {
+        try {
+          items.add(CartItem.fromJson(Map<String, dynamic>.from(item)));
+        } catch (_) {
+          break; 
+        }
+      }
 
       emit(CartState(status: CartStatus.success, items: items));
     } catch (_) {
@@ -43,6 +47,10 @@ class CartCubit extends Cubit<CartState> {
     required String imageUrl,
     int quantity = 1,
   }) async {
+    if (title.trim().isEmpty || price < 0 || quantity <= 0) {
+      return;
+    }
+
     final updatedItems = [...state.items];
     final index = updatedItems.indexWhere((item) => item.title == title);
 
