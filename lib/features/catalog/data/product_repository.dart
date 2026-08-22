@@ -56,6 +56,42 @@ class ProductRepository {
     }
   }
 
+  Future<ProductModel> fetchProductById(String id) async {
+    try {
+      final doc = await _products.doc(id).get();
+      final data = doc.data();
+
+      if (!doc.exists || data == null) {
+        throw const ProductFailure('That product no longer exists.');
+      }
+
+      return ProductModel.fromMap(doc.id, data);
+    } on FirebaseException catch (error) {
+      throw ProductFailure(_messageFor(error));
+    }
+  }
+
+  Future<ProductModel> updateProduct(ProductModel product) async {
+    try {
+      final data = product.toMap()
+        ..['updatedAt'] = FieldValue.serverTimestamp();
+
+      await _products.doc(product.id).update(data);
+
+      return product;
+    } on FirebaseException catch (error) {
+      throw ProductFailure(_messageFor(error));
+    }
+  }
+
+  Future<void> deleteProduct(String id) async {
+    try {
+      await _products.doc(id).delete();
+    } on FirebaseException catch (error) {
+      throw ProductFailure(_messageFor(error));
+    }
+  }
+
   String _messageFor(FirebaseException error) {
     switch (error.code) {
       case 'permission-denied':

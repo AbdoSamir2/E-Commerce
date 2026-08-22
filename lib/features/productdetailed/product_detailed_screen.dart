@@ -3,31 +3,114 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_project/features/productdetailed/Logic/quantity_cubit.dart';
 import 'package:e_commerce_project/features/productdetailed/Logic/wishlist_cubit.dart';
 import 'package:e_commerce_project/features/cart/logic/cart/cart_cubit.dart';
+import 'package:e_commerce_project/features/catalog/data/product_repository.dart';
+import 'package:e_commerce_project/features/catalog/logic/product_cubit.dart';
+import 'package:e_commerce_project/features/catalog/presentation/product_form_screen.dart';
+import 'package:e_commerce_project/models/product_model.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final String id;
-  final String title;
-  final double price;
-  final String imageUrl;
-  final String description;
-  final String stockStatus;
+  final ProductModel product;
 
-  const ProductDetailScreen({
-    super.key,
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.imageUrl,
-    required this.description,
-    required this.stockStatus,
-  });
+  const ProductDetailScreen({super.key, required this.product});
+
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late ProductModel _product = widget.product;
+  bool _isRefreshing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFromFirebase();
+  }
+
+  Future<void> _loadFromFirebase() async {
+    try {
+      final fresh = await context.read<ProductRepository>().fetchProductById(
+        widget.product.id,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _product = fresh;
+        _isRefreshing = false;
+      });
+    } on ProductFailure catch (failure) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isRefreshing = false;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message)));
+    }
+  }
+
+  Future<void> _editProduct() async {
+    final updated = await Navigator.of(context).push<ProductModel>(
+      MaterialPageRoute(
+        builder: (_) => ProductFormScreen(existingProduct: _product),
+      ),
+    );
+
+    if (updated == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _product = updated;
+    });
+  }
+
+  Future<void> _deleteProduct() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete product'),
+          content: Text('Remove ${_product.title} permanently?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !mounted) {
+      return;
+    }
+
+    final navigator = Navigator.of(context);
+    final wasDeleted = await context.read<ProductCubit>().deleteProduct(
+      _product.id,
+    );
+
+    if (wasDeleted && mounted) {
+      navigator.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final price = double.tryParse(_product.price) ?? 0.0;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -53,8 +136,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               );
             },
           ),
-          const SizedBox(width: 12),
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, color: Colors.black),
+            tooltip: 'Edit product',
+            onPressed: _editProduct,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.black),
+            tooltip: 'Delete product',
+            onPressed: _deleteProduct,
+          ),
+          const SizedBox(width: 4),
         ],
+        bottom: _isRefreshing
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(2),
+                child: LinearProgressIndicator(minHeight: 2),
+              )
+            : null,
       ),
       body: Center(
         child: ConstrainedBox(
@@ -66,7 +165,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 Center(
                   child: Image.network(
-                    widget.imageUrl,
+                    _product.imageUrl,
                     height: 320,
                     fit: BoxFit.contain,
                     loadingBuilder: (context, child, loadingProgress) {
@@ -101,7 +200,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.title,
+                            _product.title,
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -153,15 +252,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: widget.stockStatus.toLowerCase() == 'in stock'
+                    color: _product.stockStatus.toLowerCase() == 'in stock'
                         ? Colors.green.shade50
                         : Colors.red.shade50,
                     borderRadius: BorderRadius.circular(38),
                   ),
                   child: Text(
-                    widget.stockStatus,
+                    _product.stockStatus,
                     style: TextStyle(
-                      color: widget.stockStatus.toLowerCase() == 'in stock'
+                      color: _product.stockStatus.toLowerCase() == 'in stock'
                           ? Colors.green
                           : Colors.red,
                       fontWeight: FontWeight.bold,
@@ -180,7 +279,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  widget.description,
+                  _product.description,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -212,7 +311,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               Expanded(
                 child: Text(
-                  '\$${widget.price}',
+                  '\$${price.toStringAsFixed(2)}',
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 24,
@@ -282,16 +381,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     final quantity = context.read<QuantityCubit>().state;
 
                     context.read<CartCubit>().addToCart(
-                      title: widget.title,
-                      price: widget.price,
-                      imageUrl: widget.imageUrl,
+                      title: _product.title,
+                      price: price,
+                      imageUrl: _product.imageUrl,
                       quantity: quantity,
                     );
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'تم إضافة $quantity من ${widget.title} لعربة التسوق!',
+                          'تم إضافة $quantity من ${_product.title} لعربة التسوق!',
                         ),
                         backgroundColor: Colors.green,
                         duration: const Duration(seconds: 2),

@@ -51,4 +51,52 @@ class ProductCubit extends Cubit<ProductState> {
       return false;
     }
   }
+
+  Future<bool> updateProduct(ProductModel product) async {
+    emit(state.copyWith(isSaving: true));
+
+    try {
+      final saved = await _productRepository.updateProduct(product);
+
+      final updatedList = state.products
+          .map((item) => item.id == saved.id ? saved : item)
+          .toList();
+
+      emit(
+        ProductState(
+          status: ProductStatus.success,
+          products: List.unmodifiable(updatedList),
+        ),
+      );
+
+      return true;
+    } on ProductFailure catch (failure) {
+      emit(state.copyWith(isSaving: false, errorMessage: failure.message));
+
+      return false;
+    }
+  }
+
+  Future<bool> deleteProduct(String id) async {
+    emit(state.copyWith(isSaving: true));
+
+    try {
+      await _productRepository.deleteProduct(id);
+
+      final remaining = state.products.where((item) => item.id != id).toList();
+
+      emit(
+        ProductState(
+          status: ProductStatus.success,
+          products: List.unmodifiable(remaining),
+        ),
+      );
+
+      return true;
+    } on ProductFailure catch (failure) {
+      emit(state.copyWith(isSaving: false, errorMessage: failure.message));
+
+      return false;
+    }
+  }
 }

@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               SectionHeader(title: 'Popular Products'),
-              
+
               BlocBuilder<ProductCubit, ProductState>(
                 builder: (context, state) {
                   if (state.status == ProductStatus.loading) {
@@ -144,14 +144,7 @@ class HomeScreen extends StatelessWidget {
                                     create: (_) => WishlistCubit(product.id),
                                   ),
                                 ],
-                                child: ProductDetailScreen(
-                                  id: product.id,
-                                  title: product.title,
-                                  price: double.parse(product.price.toString()),
-                                  imageUrl: product.imageUrl,
-                                  description: product.description,
-                                  stockStatus: product.stockStatus,
-                                ),
+                                child: ProductDetailScreen(product: product),
                               ),
                             ),
                           );

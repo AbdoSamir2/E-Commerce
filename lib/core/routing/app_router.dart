@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/catalog/presentation/add_product_screen.dart';
+import '../../features/catalog/presentation/product_form_screen.dart';
 import '../../features/navigation/presentation/screens/main_shell.dart';
 import 'app_routes.dart';
 
@@ -41,7 +41,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.addProduct,
       builder: (context, state) {
-        return const AddProductScreen();
+        return const ProductFormScreen();
       },
     ),
   ],

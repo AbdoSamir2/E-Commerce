@@ -137,14 +137,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                 create: (_) => WishlistCubit(product.id),
                               ),
                             ],
-                            child: ProductDetailScreen(
-                              id: product.id,
-                              title: product.title,
-                              price: double.parse(product.price.toString()),
-                              imageUrl: product.imageUrl,
-                              description: product.description,
-                              stockStatus: product.stockStatus,
-                            ),
+                            child: ProductDetailScreen(product: product),
                           ),
                         ),
                       );

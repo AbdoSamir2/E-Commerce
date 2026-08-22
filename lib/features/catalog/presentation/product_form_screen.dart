@@ -5,14 +5,18 @@ import '../../../models/product_model.dart';
 import '../logic/product_cubit.dart';
 import '../logic/product_state.dart';
 
-class AddProductScreen extends StatefulWidget {
-  const AddProductScreen({super.key});
+class ProductFormScreen extends StatefulWidget {
+  const ProductFormScreen({super.key, this.existingProduct});
+
+  final ProductModel? existingProduct;
+
+  bool get isEditing => existingProduct != null;
 
   @override
-  State<AddProductScreen> createState() => _AddProductScreenState();
+  State<ProductFormScreen> createState() => _ProductFormScreenState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
+class _ProductFormScreenState extends State<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _priceController = TextEditingController();
@@ -20,6 +24,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _descriptionController = TextEditingController();
 
   String _stockStatus = 'In stock';
+
+  @override
+  void initState() {
+    super.initState();
+
+    final product = widget.existingProduct;
+    if (product == null) {
+      return;
+    }
+
+    _titleController.text = product.title;
+    _priceController.text = product.price;
+    _imageUrlController.text = product.imageUrl;
+    _descriptionController.text = product.description;
+    _stockStatus = product.stockStatus;
+  }
 
   @override
   void dispose() {
@@ -38,7 +58,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     final description = _descriptionController.text.trim();
 
     final product = ProductModel(
-      id: '',
+      id: widget.existingProduct?.id ?? '',
       title: _titleController.text.trim(),
       price: _priceController.text.trim(),
       imageUrl: _imageUrlController.text.trim(),
@@ -50,22 +70,31 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final wasAdded = await context.read<ProductCubit>().addProduct(product);
+    final cubit = context.read<ProductCubit>();
+
+    final wasSaved = widget.isEditing
+        ? await cubit.updateProduct(product)
+        : await cubit.addProduct(product);
 
     if (!mounted) {
       return;
     }
 
-    if (wasAdded) {
-      messenger.showSnackBar(SnackBar(content: Text('${product.title} added')));
-      navigator.pop();
+    if (wasSaved) {
+      final action = widget.isEditing ? 'updated' : 'added';
+      messenger.showSnackBar(
+        SnackBar(content: Text('${product.title} $action')),
+      );
+      navigator.pop(product);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add product')),
+      appBar: AppBar(
+        title: Text(widget.isEditing ? 'Edit product' : 'Add product'),
+      ),
       body: BlocListener<ProductCubit, ProductState>(
         listenWhen: (previous, current) =>
             current.errorMessage != null &&
@@ -198,7 +227,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Save product'),
+                            : Text(
+                                widget.isEditing
+                                    ? 'Save changes'
+                                    : 'Save product',
+                              ),
                       );
                     },
                   ),

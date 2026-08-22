@@ -26,7 +26,7 @@ class CartCubit extends Cubit<CartState> {
         try {
           items.add(CartItem.fromJson(Map<String, dynamic>.from(item)));
         } catch (_) {
-          break; 
+          break;
         }
       }
 

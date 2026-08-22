@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -12,7 +13,7 @@ void main() {
       EcommerceApp(localStorageService: MockLocalStorageService()),
     );
 
-    expect(find.text('E-Commerce App v1.0'), findsOneWidget);
+    expect(find.byIcon(Icons.shopping_bag_rounded), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
